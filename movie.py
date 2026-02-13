@@ -6,7 +6,6 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-
 class MovieTicket:
     ticket_price = 150
 
@@ -21,18 +20,22 @@ class MovieTicket:
 
         logging.info("%s booked %d seat(s)", self.name, self.seats_booked)
 
-
-    def cancel_booking(self):
-        if self.seats_booked <= 0:
-            logging.warning("User tried to cancel without booking")
+    def cancel_booking(self, seats_to_cancel):
+        if seats_to_cancel <= 0:
+            logging.warning("Invalid number of seats entered for cancellation")
             return
 
-        logging.info("%d seats cancelled successfully", self.seats_booked)
-        self.seats_booked = 0
+        if seats_to_cancel > self.seats_booked:
+            logging.error("Cannot cancel %d seats, only %d booked", seats_to_cancel, self.seats_booked)
+            return
+
+        self.seats_booked -= seats_to_cancel
+        logging.info("%d seat(s) cancelled successfully for %s. Remaining seats: %d",
+                     seats_to_cancel, self.name, self.seats_booked)
 
     def calculate_ticket_price(self):
         total = self.seats_booked * MovieTicket.ticket_price
-        logging.info("%d total ticket price calculated for %s",total, self.name)
+        logging.info("%d total ticket price calculated for %s", total, self.name)
 
     @classmethod
     def update_ticket_price(cls, price):
@@ -43,15 +46,13 @@ class MovieTicket:
         cls.ticket_price = price
         logging.info("Ticket price updated to %d", price)
 
-
 m1 = MovieTicket("MOV101", 3)
 m1.book_seat()
 m1.calculate_ticket_price()
-m1.cancel_booking()
+
+# Cancel seats
+m1.cancel_booking(2) 
+m1.cancel_booking(5)
+m1.cancel_booking(-1) 
+
 m1.calculate_ticket_price()
-
-MovieTicket.update_ticket_price(200)
-
-m2 = MovieTicket("MOV102", 2)
-m2.book_seat()
-m2.calculate_ticket_price()
